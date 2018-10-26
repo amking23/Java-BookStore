@@ -52,18 +52,22 @@ public class ControllerServlet extends HttpServlet {
 			switch(action) {
 				case "/admin":
 					 showBookAdmin(request, response);
-           break;
-			  case "/new":
+					 break;
+			  	case "/new":
 					showNewForm(request, response);
-          break;
+          			break;
 				case "/insert":
 					insertBook(request, response);
-          break;
+          			break;
 				case "/delete":
 					deleteBook(request, response);
-        default:
+					break;
+				case "/edit":
+					showEditForm(request, response);
+					break;
+        		default:
 				   listBooks(request, response);
-           break;
+				   break;
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -96,24 +100,33 @@ public class ControllerServlet extends HttpServlet {
 	}
 
 	private void insertBook(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, ClassNotFoundException, SQLException {
-		String title = request.getParameter("booktitle");
-		String author = request.getParameter("bookauthor");
-		String priceString = request.getParameter("bookprice");
+		throws ServletException, IOException, ClassNotFoundException, SQLException {
+			String title = request.getParameter("booktitle");
+			String author = request.getParameter("bookauthor");
+			String priceString = request.getParameter("bookprice");
 
-		Book newBook = new Book(title, author, Float.parseFloat(priceString));
+			Book newBook = new Book(title, author, Float.parseFloat(priceString));
 
-		bookDAO.insertBook(newBook);
-		response.sendRedirect("list");
-	}
+			bookDAO.insertBook(newBook);
+			response.sendRedirect("list");
+		}
 
 	private void deleteBook(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		int id = Integer.parseInt(request.getParameter("id"));
-		bookDAO.deleteBook(id);
+		throws ServletException, IOException {
+			int id = Integer.parseInt(request.getParameter("id"));
+			bookDAO.deleteBook(id);
 
-		response.sendRedirect("list");
-	}
+			response.sendRedirect("list");
+		}
+
+	private void showEditForm(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException, IOException {
+			int id = Integer.parseInt(request.getParameter("id"));
+			Book existingBook = bookDAO.getBook(id);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/BookForm.jsp");
+			request.setAttribute("book", existingBook);
+			dispatcher.forward(request, response);
+		}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
